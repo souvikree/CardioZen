@@ -1,0 +1,17 @@
+# Ignore virtual environment
+venv/
+
+# Ignore datasets
+Heart_Disease_Prediction.csv
+
+# Ignore model files
+scaler.pkl
+heart_disease_model.pkl
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore environment variables file
+.env
