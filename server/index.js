@@ -7,7 +7,9 @@ const helmet = require('helmet');
 const errorMiddleware = require('./Middlewares/errorMiddleware');
 const predictionRoutes = require('./Routes/predictionRoutes');
 const authRoutes = require('./Routes/authRoutes');
-const authMiddleware = require('./Middlewares/authMiddleware');
+
+const userInputRoutes = require('./Routes/userInputRoutes');
+
 
 require("./Database/db") 
 require("dotenv").config();
@@ -45,8 +47,8 @@ app.use(express.json()); // For parsing application/json
 
 // Use prediction routes
 app.use('/api/auth', authRoutes);
-app.use('/api', predictionRoutes);
-
+app.use('/api/predict', predictionRoutes);
+app.use('/api/userinput', userInputRoutes);
 // Error handling middleware
 app.use(errorMiddleware);
 

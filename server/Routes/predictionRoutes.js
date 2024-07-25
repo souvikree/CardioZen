@@ -1,8 +1,9 @@
 const express = require('express');
-const router = express.Router();
-const predictionController = require('../Controllers/predictionController');
+const { predictHeartDisease } = require('../Controllers/predictionController');
 
-// Route to handle prediction requests
-router.post('/predict', predictionController.predict);
+const router = express.Router();
+
+// Define the route for prediction
+router.post('/hpredict',  predictHeartDisease);
 
 module.exports = router;

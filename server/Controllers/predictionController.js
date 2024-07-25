@@ -1,35 +1,103 @@
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const path = require('path');
+const UserInput = require('../Models/userInputModel'); // Import the model
+const picklejs = require('picklejs'); // Ensure this is installed via npm
 
-// Function to run the Python script and get predictions
-function getPrediction(inputData, callback) {
-    const pythonScriptPath = path.join(__dirname, '../predict.py');
-    const inputJson = JSON.stringify(inputData);
+let model, scaler;
 
-    exec(`python ${pythonScriptPath}`, { input: inputJson }, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error executing Python script: ${error}`);
-            return callback(error, null);
-        }
-        if (stderr) {
-            console.error(`Python script stderr: ${stderr}`);
-            return callback(stderr, null);
-        }
-
-        // Parse the JSON output
-        const result = JSON.parse(stdout);
-        callback(null, result);
-    });
+function deserializeObject(base64String) {
+    const buffer = Buffer.from(base64String, 'base64');
+    return picklejs.load(buffer);
 }
 
-// Controller function to handle prediction requests
-exports.predict = (req, res, next) => {
-    const inputData = req.body;  // Expecting JSON input from the request body
+async function loadModel() {
+    try {
+        const pythonScriptPath = path.join(__dirname, '../../load_model.py');
+        const pythonProcess = spawn('python', [pythonScriptPath]);
 
-    getPrediction(inputData, (error, result) => {
-        if (error) {
-            return next(error);
+        return new Promise((resolve, reject) => {
+            let data = '';
+            let error = '';
+
+            pythonProcess.stdout.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            pythonProcess.stderr.on('data', (chunk) => {
+                error += chunk;
+            });
+
+            pythonProcess.on('close', (code) => {
+                if (code !== 0) {
+                    reject(new Error(`Python process exited with code ${code}: ${error}`));
+                }
+                try {
+                    const { model: serializedModel, scaler: serializedScaler } = JSON.parse(data);
+                    model = deserializeObject(serializedModel);
+                    scaler = deserializeObject(serializedScaler);
+                    resolve();
+                } catch (error) {
+                    reject(new Error('Failed to parse model or scaler data'));
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error loading model or scaler:', error);
+        throw error;
+    }
+}
+
+exports.predictHeartDisease = async (req, res, next) => {
+    try {
+        if (!model || !scaler) {
+            await loadModel();
         }
-        res.json(result);
-    });
+
+        const inputData = req.body;
+
+        const pythonProcess = spawn('python', [path.join(__dirname, '../../predict.py')]);
+
+        pythonProcess.stdin.write(JSON.stringify(inputData));
+        pythonProcess.stdin.end();
+
+        let data = '';
+        let error = '';
+
+        pythonProcess.stdout.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        pythonProcess.stderr.on('data', (chunk) => {
+            error += chunk;
+        });
+
+        pythonProcess.on('close', async (code) => {
+            if (code !== 0) {
+                return res.status(500).json({ error: `Prediction process failed: ${error}` });
+            }
+            try {
+                if (!data) {
+                    throw new Error('No data received from Python script');
+                }
+                const prediction = JSON.parse(data);
+
+                // Save user input and prediction to the database
+                const userInput = new UserInput({
+                    ...inputData,
+                    heartDisease: prediction.prediction // Adjust field name to match Python output
+                });
+
+                await userInput.save();
+                res.status(200).json({
+                    success: true,
+                    prediction: prediction.prediction, // Return prediction result
+                    data: userInput
+                });
+            } catch (error) {
+                next(error);
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
 };
