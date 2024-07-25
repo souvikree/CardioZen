@@ -56,7 +56,7 @@ const userInputSchema = new mongoose.Schema({
     },
     heartDisease: {
         type: String,
-        enum: ['presence', 'absence'], // Restrict values to 'presence' or 'absence'
+        // enum: ['presence', 'absence'], // Restrict values to 'presence' or 'absence'
         required: true // Make this field required
     },
 }, { timestamps: true });

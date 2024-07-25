@@ -4,8 +4,15 @@ import joblib
 import base64
 import io
 import numpy as np
+from flask_pymongo import PyMongo
+from functools import wraps
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
+
+# Configure the MongoDB database
+app.config["MONGO_URI"] = "mongodb+srv://swooshyboi003:soureeksta@cluster0.estzco3.mongodb.net/CardioZen?retryWrites=true&w=majority&appName=Cluster0"
+mongo = PyMongo(app)
 
 def deserialize_object(encoded_str):
     decoded = base64.b64decode(encoded_str)
@@ -22,10 +29,29 @@ def load_model_and_scaler():
 
 model, scaler = load_model_and_scaler()
 
+# Authorization check decorator
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+        # Here you can add logic to validate the token
+        # if not valid_token(token):
+        #     return jsonify({'message': 'Token is invalid!'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route('/api/predict/hpredict', methods=['POST'])
+@token_required
 def predict():
     try:
+        # Get the input data from the request
         input_json = request.json
+        
+        # Define feature mapping
         feature_mapping = {
             'age': 'Age',
             'sex': 'Sex',
@@ -41,14 +67,36 @@ def predict():
             'numberOfVesselsFluro': 'Number of vessels fluro',
             'thallium': 'Thallium'
         }
-        input_features = [input_json[key] for key in feature_mapping.keys()]
+
+        # Extract input features from the request
+        input_features = [input_json.get(key) for key in feature_mapping.keys()]
         input_array = np.array(input_features).reshape(1, -1)
+
+        # Scale the input data
         scaled_data = scaler.transform(input_array)
+
+        # Make a prediction
         prediction = model.predict(scaled_data)
         heart_disease_status = 'presence' if prediction[0] == 1 else 'absence'
-        return jsonify({"heartDisease": heart_disease_status})
+        
+        # Add heart disease status to input data
+        input_json['heartDisease'] = heart_disease_status
+
+        # Store the prediction data in MongoDB
+        result = mongo.db.predictions.insert_one(input_json)
+
+        # Convert ObjectId to string for JSON serialization
+        input_json['_id'] = str(result.inserted_id)
+
+        # Return the modified input data with a success message
+        response_data = {
+            "message": "Prediction data saved successfully",
+            "inputData": input_json
+        }
+        return jsonify(response_data), 201
+
     except Exception as e:
-        return jsonify({"error": "An error occurred during prediction", "details": str(e)})
+        return jsonify({"error": "An error occurred during prediction", "details": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8000, debug=True)
