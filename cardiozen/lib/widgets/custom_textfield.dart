@@ -6,7 +6,8 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType keyboardType;
 
-  const CustomTextField({super.key, 
+  const CustomTextField({
+    super.key,
     required this.controller,
     required this.hintText,
     this.obscureText = false,
@@ -21,11 +22,10 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       decoration: InputDecoration(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         hintText: hintText,
-        filled: true,
-        fillColor: Colors.grey[200],
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
       ),
     );
   }

@@ -19,7 +19,7 @@ class AuthenticationService {
     return response.statusCode == 200;
   }
 
-  Future<bool> register(String email, String password, String name) async {
+  Future<bool> register(String email, String password, String username) async {
     final response = await http.post(
       Uri.parse('$baseUrl/register'),
       headers: <String, String>{
@@ -28,7 +28,7 @@ class AuthenticationService {
       body: jsonEncode({
         'email': email,
         'password': password,
-        'name': name,
+        'username': username,
       }),
     );
 
