@@ -7,11 +7,16 @@ import numpy as np
 from flask_pymongo import PyMongo
 from functools import wraps
 from bson.objectid import ObjectId
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# Configure the MongoDB database
-app.config["MONGO_URI"] = "mongodb+srv://swooshyboi003:soureeksta@cluster0.estzco3.mongodb.net/CardioZen?retryWrites=true&w=majority&appName=Cluster0"
+# Configure the MongoDB database using environment variable
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
 def deserialize_object(encoded_str):
