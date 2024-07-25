@@ -1,103 +1,69 @@
-const { spawn } = require('child_process');
+const { PythonShell } = require('python-shell');
 const path = require('path');
-const UserInput = require('../Models/userInputModel'); // Import the model
-const picklejs = require('picklejs'); // Ensure this is installed via npm
+const UserInput = require('../Models/userInputModel');  // Adjust the path as needed
 
-let model, scaler;
-
-function deserializeObject(base64String) {
-    const buffer = Buffer.from(base64String, 'base64');
-    return picklejs.load(buffer);
-}
-
+// Load model and scaler (if needed, based on your use case)
 async function loadModel() {
     try {
-        const pythonScriptPath = path.join(__dirname, '../../load_model.py');
-        const pythonProcess = spawn('python', [pythonScriptPath]);
-
-        return new Promise((resolve, reject) => {
-            let data = '';
-            let error = '';
-
-            pythonProcess.stdout.on('data', (chunk) => {
-                data += chunk;
-            });
-
-            pythonProcess.stderr.on('data', (chunk) => {
-                error += chunk;
-            });
-
-            pythonProcess.on('close', (code) => {
-                if (code !== 0) {
-                    reject(new Error(`Python process exited with code ${code}: ${error}`));
-                }
-                try {
-                    const { model: serializedModel, scaler: serializedScaler } = JSON.parse(data);
-                    model = deserializeObject(serializedModel);
-                    scaler = deserializeObject(serializedScaler);
-                    resolve();
-                } catch (error) {
-                    reject(new Error('Failed to parse model or scaler data'));
-                }
-            });
-        });
+        // Note: Loading model is not used in this case
+        console.log("Loading model is not needed here");
     } catch (error) {
-        console.error('Error loading model or scaler:', error);
+        console.error('Error loading model:', error);
         throw error;
     }
 }
 
-exports.predictHeartDisease = async (req, res, next) => {
+// Predict heart disease based on input data
+async function predictHeartDisease(inputData) {
+    const options = {
+        mode: 'text',
+        pythonOptions: ['-u'],
+        scriptPath: path.join(__dirname, '../../'),
+        args: [JSON.stringify(inputData)]
+    };
+
+    return new Promise((resolve, reject) => {
+        PythonShell.run('predict.py', options, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                try {
+                    const prediction = JSON.parse(result[0]);
+                    resolve(prediction);
+                } catch (parseError) {
+                    reject(new Error('Failed to parse prediction result'));
+                }
+            }
+        });
+    });
+}
+
+// Handle prediction requests
+exports.handlePredictionRequest = async (req, res, next) => {
     try {
-        if (!model || !scaler) {
-            await loadModel();
-        }
+        // Ensure model is loaded if necessary
+        // await loadModel(); // Commented out since model loading is not needed here
 
         const inputData = req.body;
+        const prediction = await predictHeartDisease(inputData);
 
-        const pythonProcess = spawn('python', [path.join(__dirname, '../../predict.py')]);
+        // Update to use 'heartDisease' directly from prediction result
+        const heartDiseaseStatus = prediction.heartDisease;
 
-        pythonProcess.stdin.write(JSON.stringify(inputData));
-        pythonProcess.stdin.end();
-
-        let data = '';
-        let error = '';
-
-        pythonProcess.stdout.on('data', (chunk) => {
-            data += chunk;
+        // Save user input and prediction to the database
+        const userInput = new UserInput({
+            ...inputData,
+            heartDisease: heartDiseaseStatus
         });
 
-        pythonProcess.stderr.on('data', (chunk) => {
-            error += chunk;
-        });
-
-        pythonProcess.on('close', async (code) => {
-            if (code !== 0) {
-                return res.status(500).json({ error: `Prediction process failed: ${error}` });
-            }
-            try {
-                if (!data) {
-                    throw new Error('No data received from Python script');
-                }
-                const prediction = JSON.parse(data);
-
-                // Save user input and prediction to the database
-                const userInput = new UserInput({
-                    ...inputData,
-                    heartDisease: prediction.prediction // Adjust field name to match Python output
-                });
-
-                await userInput.save();
-                res.status(200).json({
-                    success: true,
-                    prediction: prediction.prediction, // Return prediction result
-                    data: userInput
-                });
-            } catch (error) {
-                next(error);
-            }
+        await userInput.save();
+        res.status(200).json({
+            success: true,
+            prediction: heartDiseaseStatus,
+            data: userInput
         });
     } catch (error) {
+        console.error('Error handling prediction request:', error);
         next(error);
     }
 };

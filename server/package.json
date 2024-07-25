@@ -25,6 +25,7 @@
     "mongoose": "^8.5.1",
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.4",
-    "picklejs": "^0.101.0"
+    "picklejs": "^0.101.0",
+    "python-shell": "^5.0.0"
   }
 }
