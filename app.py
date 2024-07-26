@@ -49,6 +49,36 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
+def map_descriptions_to_values(input_json):
+    mapping = {
+        "Typical Angina (1)": 1,
+        "Atypical Angina (2)": 2,
+        "Non-anginal Pain (3)": 3,
+        "Asymptomatic (4)": 4,
+        "Normal (0)": 0,
+        "ST-T wave abnormality (1)": 1,
+        "Left ventricular hypertrophy (2)": 2,
+        "Upsloping (1)": 1,
+        "Flat (2)": 2,
+        "Downsloping (3)": 3,
+        "Normal (3)": 3,
+        "Fixed defect (6)": 6,
+        "Reversible defect (7)": 7
+    }
+
+    fields_to_map = [
+        "chestPainType",
+        "ekgResults",
+        "slopeOfSt",
+        "thallium"
+    ]
+
+    for field in fields_to_map:
+        if field in input_json:
+            input_json[field] = mapping.get(input_json[field], input_json[field])
+
+    return input_json
+
 @app.route('/api/predict/hpredict', methods=['POST'])
 @token_required
 def predict():
@@ -56,20 +86,22 @@ def predict():
         # Get the input data from the request
         input_json = request.json
 
-        # Convert 'sex' to numeric value
+        # Map 'male' to 1, 'female' and 'others' to 0 for the 'sex' field
         if 'sex' in input_json:
             sex = input_json['sex'].lower()
-            input_json['sex'] = 1 if sex == 'male' else 0
-
-        # Convert user-friendly inputs to numeric format
-        if 'fbsOver120' in input_json:
-            fbs_over_120 = input_json['fbsOver120'].lower()
-            if fbs_over_120 in ['yes', '1']:
-                input_json['fbsOver120'] = 1
-            elif fbs_over_120 in ['no', '0']:
-                input_json['fbsOver120'] = 0
+            if sex == 'male':
+                input_json['sex'] = 1
             else:
-                return jsonify({"error": "Invalid value for fbsOver120. Use 'yes', 'no', '1', or '0'."}), 400
+                input_json['sex'] = 0
+        
+        # Map 'yes' to 1, 'no' to 0 for 'fbsOver120' and 'exerciseAngina' fields
+        if 'fbsOver120' in input_json:
+            input_json['fbsOver120'] = 1 if input_json['fbsOver120'].lower() == 'yes' else 0
+        if 'exerciseAngina' in input_json:
+            input_json['exerciseAngina'] = 1 if input_json['exerciseAngina'].lower() == 'yes' else 0
+        
+        # Map descriptive strings to their corresponding numeric values
+        input_json = map_descriptions_to_values(input_json)
 
         # Define feature mapping
         feature_mapping = {
@@ -90,11 +122,6 @@ def predict():
 
         # Extract input features from the request
         input_features = [input_json.get(key) for key in feature_mapping.keys()]
-        
-        # Check for missing values
-        if None in input_features:
-            return jsonify({"error": "Missing values in input data"}), 400
-
         input_array = np.array(input_features).reshape(1, -1)
 
         # Scale the input data
