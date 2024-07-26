@@ -55,7 +55,22 @@ def predict():
     try:
         # Get the input data from the request
         input_json = request.json
-        
+
+        # Convert 'sex' to numeric value
+        if 'sex' in input_json:
+            sex = input_json['sex'].lower()
+            input_json['sex'] = 1 if sex == 'male' else 0
+
+        # Convert user-friendly inputs to numeric format
+        if 'fbsOver120' in input_json:
+            fbs_over_120 = input_json['fbsOver120'].lower()
+            if fbs_over_120 in ['yes', '1']:
+                input_json['fbsOver120'] = 1
+            elif fbs_over_120 in ['no', '0']:
+                input_json['fbsOver120'] = 0
+            else:
+                return jsonify({"error": "Invalid value for fbsOver120. Use 'yes', 'no', '1', or '0'."}), 400
+
         # Define feature mapping
         feature_mapping = {
             'age': 'Age',
@@ -75,6 +90,11 @@ def predict():
 
         # Extract input features from the request
         input_features = [input_json.get(key) for key in feature_mapping.keys()]
+        
+        # Check for missing values
+        if None in input_features:
+            return jsonify({"error": "Missing values in input data"}), 400
+
         input_array = np.array(input_features).reshape(1, -1)
 
         # Scale the input data
