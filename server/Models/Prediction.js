@@ -1,15 +1,25 @@
-// models/Prediction.js
+// server/Models/Prediction.js
+
 const mongoose = require('mongoose');
 
-const PredictionSchema = new mongoose.Schema({
-    inputData: {
-        type: Object,
-        required: true
-    },
-    heartDisease: {
-        type: String,
-        required: true
-    }
+const predictionSchema = new mongoose.Schema({
+    age: Number,
+    sex: Number,
+    chestPainType: Number,
+    bp: Number,
+    cholesterol: Number,
+    fbsOver120: Number,
+    ekgResults: Number,
+    maxHr: Number,
+    exerciseAngina: Number,
+    stDepression: Number,
+    slopeOfSt: Number,
+    numberOfVesselsFluro: Number,
+    thallium: Number,
+    heartDisease: String,
+    date: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Prediction', PredictionSchema);
+const Prediction = mongoose.model('Prediction', predictionSchema);
+
+module.exports = Prediction;

@@ -68,37 +68,47 @@
 
 // Controllers/predictionController.js
 
-const axios = require('axios');
-const Prediction = require('../Models/Prediction'); // Import the Mongoose model
+// const axios = require('axios');
+const Prediction = require('../Models/Prediction');
+
 
 // Define the base URL of your Flask API
-const FLASK_API_URL = 'http://192.168.0.129:8000/api/predict/hpredict';
+// const FLASK_API_URL = 'http://192.168.0.129:8000/api/predict/hpredict';
 
 // Function to send prediction request to the Flask API and save the result
-const getPrediction = async (inputData) => {
+// const getPrediction = async (inputData) => {
+//     try {
+//         // Make a POST request to the Flask API with the input data
+//         const response = await axios.post(FLASK_API_URL, inputData);
+
+//         // Extract the data from the response
+//         const responseData = response.data;
+
+//         // Save the response data to the database
+//         const prediction = new Prediction({
+//             inputData: responseData.inputData,
+//             heartDisease: responseData.inputData.heartDisease
+//         });
+
+//         await prediction.save();
+
+//         // Return the response data
+//         return responseData;
+//     } catch (error) {
+//         console.error('Error making prediction request:', error.message);
+//         throw error;
+//     }
+// };
+exports.getAllPredictions = async (req, res) => {
     try {
-        // Make a POST request to the Flask API with the input data
-        const response = await axios.post(FLASK_API_URL, inputData);
-
-        // Extract the data from the response
-        const responseData = response.data;
-
-        // Save the response data to the database
-        const prediction = new Prediction({
-            inputData: responseData.inputData,
-            heartDisease: responseData.inputData.heartDisease
-        });
-
-        await prediction.save();
-
-        // Return the response data
-        return responseData;
-    } catch (error) {
-        console.error('Error making prediction request:', error.message);
-        throw error;
+        const userId = req.user.id; // Assuming req.user is set by your authentication middleware
+        const predictions = await Prediction.find({ userId });
+        res.status(200).json(predictions);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };
 
-module.exports = {
-    getPrediction
-};
+// module.exports = {
+//     getPrediction
+// };

@@ -1,5 +1,5 @@
 const express = require('express');
-const {  getPrediction } = require('../Controllers/predictionController');
+const {  getPrediction, getAllPredictions } = require('../Controllers/predictionController');
 const authMiddleware = require('../Middlewares/authMiddleware');
 
 const router = express.Router();
@@ -22,6 +22,8 @@ router.post('/sav', authMiddleware, async (req, res) => {
         res.status(500).json({ error: 'Failed to get prediction' });
     }
 });
+
+router.get('/predictions', authMiddleware, getAllPredictions)
 
 
 module.exports = router;
