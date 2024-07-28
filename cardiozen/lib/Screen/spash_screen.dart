@@ -1,3 +1,4 @@
+import 'package:cardiozen/Screen/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cardiozen/Screen/sign_in.dart';
 import 'package:cardiozen/Utils/colors.dart';
@@ -94,6 +95,15 @@ class MySplashScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: Center(
+                                  child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Register(),
+                                    ),
+                                  );
+                                },
                                   child: Text(
                                     "Register",
                                     style: TextStyle(
@@ -101,6 +111,7 @@ class MySplashScreen extends StatelessWidget {
                                       fontSize: 20,
                                       color: textColor1,
                                     ),
+                                  ),
                                   ),
                                 ),
                               ),

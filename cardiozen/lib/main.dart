@@ -1,12 +1,13 @@
 import 'package:cardiozen/Screen/spash_screen.dart';
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/prediction_screen.dart';
-import 'screens/registration_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'screens/home_screen.dart';
+// import 'screens/login_screen.dart';
+// import 'screens/prediction_screen.dart';
+// import 'screens/registration_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
