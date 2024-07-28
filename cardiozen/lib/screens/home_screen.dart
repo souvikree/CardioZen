@@ -89,11 +89,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(24),
-          topLeft: Radius.circular(24),
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(24),
         ),
         boxShadow: [
           BoxShadow(
@@ -103,24 +100,58 @@ class CustomBottomNavigationBar extends StatelessWidget {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(24),
-          topLeft: Radius.circular(24),
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
-        ),
-        child: NavigationBar(
-          selectedIndex: currentIndex,
-          onDestinationSelected: onDestinationSelected,
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-            NavigationDestination(
-                icon: Icon(Icons.settings), label: 'Settings'),
-            NavigationDestination(icon: Icon(Icons.help), label: 'Help'),
-            NavigationDestination(
-                icon: Icon(Icons.account_box), label: 'Profile'),
-          ],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(Icons.home, 'Home', 0),
+          _buildNavItem(Icons.settings, 'Settings', 1),
+          _buildNavItem(Icons.help, 'Help', 2),
+          _buildNavItem(Icons.account_box, 'Profile', 3),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    final isSelected = currentIndex == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          onDestinationSelected(index);
+        },
+        child: Container(
+          margin: const EdgeInsets.all(4),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(24),
+            ),
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [Color(0xFF4B39EF), Color(0xFFB946F5)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: isSelected ? null : Colors.transparent,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : Colors.grey,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.grey,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
