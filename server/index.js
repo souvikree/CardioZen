@@ -8,7 +8,7 @@ const errorMiddleware = require('./Middlewares/errorMiddleware');
 const predictionRoutes = require('./Routes/predictionRoutes');
 const authRoutes = require('./Routes/authRoutes');
 
-const userInputRoutes = require('./Routes/userInputRoutes');
+// const userInputRoutes = require('./Routes/userInputRoutes');
 
 
 require("./Database/db") 
@@ -43,12 +43,12 @@ app.use((_req, res, next) => {
 });
 
 
-app.use(express.json()); // For parsing application/json
+app.use(express.json()); 
 
 // Use prediction routes
 app.use('/api/auth', authRoutes);
 app.use('/api/predict', predictionRoutes);
-app.use('/api/userinput', userInputRoutes);
+// app.use('/api/userinput', userInputRoutes);
 // Error handling middleware
 app.use(errorMiddleware);
 
