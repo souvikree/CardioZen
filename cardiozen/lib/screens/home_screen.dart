@@ -58,10 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
         items: [
           BottomNavigationBarItem(
             icon: _buildIcon(Icons.home, 0),
-            label: 'Home',
+            label: 'Profile',
           ),
           BottomNavigationBarItem(
-            icon: _buildIcon(Icons.person, 1),
+            icon: _buildIcon(Icons.home, 1),
             label: 'Profile',
           ),
           BottomNavigationBarItem(

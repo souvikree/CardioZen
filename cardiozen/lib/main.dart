@@ -1,3 +1,4 @@
+import 'package:cardiozen/Screen/spash_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -19,12 +20,15 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/login',
+      initialRoute: '/splash_screen',
       routes: {
-        '/home': (context) => const HomeScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegistrationScreen(),
-        '/prediction': (context) => const PredictionScreen(),
+        // '/home': (context) => const HomeScreen(),
+        // '/login': (context) => const LoginScreen(),
+        // '/register': (context) => const RegistrationScreen(),
+        // '/prediction': (context) => const PredictionScreen(),
+        '/splash_screen': (context) => const MySplashScreen(),
+
+        
       },
     );
   }
