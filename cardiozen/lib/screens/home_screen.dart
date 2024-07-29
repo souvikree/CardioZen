@@ -1,5 +1,7 @@
+import 'package:cardiozen/Screen/account_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 // Provider to manage the index of the bottom navigation bar
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
@@ -32,6 +34,21 @@ class HomeScreen extends ConsumerWidget {
               print('Notification icon pressed');
             },
           ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AccountScreen()),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 16),
+              child: const CircleAvatar(
+                radius: 20,
+                backgroundImage: AssetImage('images/profile.avif'),
+              ),
+            ),
+          ),
         ],
       ),
       body: IndexedStack(
@@ -46,6 +63,12 @@ class HomeScreen extends ConsumerWidget {
           Center(
             child: Icon(
               Icons.settings,
+              size: 100,
+            ),
+          ),
+          Center(
+            child: Icon(
+              Icons.add,
               size: 100,
             ),
           ),
@@ -105,8 +128,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
         children: [
           _buildNavItem(Icons.home, 'Home', 0),
           _buildNavItem(Icons.settings, 'Settings', 1),
-          _buildNavItem(Icons.help, 'Help', 2),
-          _buildNavItem(Icons.account_box, 'Profile', 3),
+          _buildNavItem(Icons.add, 'Predict', 2),
+          _buildNavItem(Icons.help, 'Help', 3),
+          _buildNavItem(Icons.account_box, 'Profile', 4),
         ],
       ),
     );
