@@ -26,9 +26,9 @@ class EditItem extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            // padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: Color.fromARGB(255, 255, 255, 255),
               borderRadius: BorderRadius.circular(10),
             ),
             child: widget,

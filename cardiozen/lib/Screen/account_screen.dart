@@ -14,6 +14,7 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   bool isDarkMode = false;
+  bool isLocation = false;
  
 
   @override
@@ -21,7 +22,9 @@ class _AccountScreenState extends State<AccountScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
           icon: const Icon(Ionicons.chevron_back_outline),
         ),
         leadingWidth: 80,
@@ -99,7 +102,7 @@ class _AccountScreenState extends State<AccountScreen> {
               const SizedBox(height: 20),
               SettingItem(
                 title: "Language",
-                icon: Ionicons.earth,
+                icon: Icons.translate,
                 bgColor: Colors.orange.shade100,
                 iconColor: Colors.orange,
                 value: "English",
@@ -128,9 +131,31 @@ class _AccountScreenState extends State<AccountScreen> {
                 },
               ),
               const SizedBox(height: 20),
+              SettingSwitch(
+                title: "Geolocation",
+                icon: Ionicons.location_outline,
+                
+                bgColor: const Color.fromARGB(255, 217, 210, 218),
+                iconColor: const Color.fromARGB(255, 65, 13, 160),
+                value: isLocation,
+                onTap: (value) {
+                  setState(() {
+                    isLocation = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 20),
               SettingItem(
-                title: "Help",
-                icon: Ionicons.help,
+                title: "Privacy & Policies",
+                icon: Ionicons.shield_outline,
+                bgColor: Colors.red.shade100,
+                iconColor: Colors.red,
+                onTap: () {},
+              ),
+              const SizedBox(height: 20),
+              SettingItem(
+                title: "Help & Support",
+                icon: Ionicons.help_outline,
                 bgColor: Colors.red.shade100,
                 iconColor: Colors.red,
                 onTap: () {},
@@ -138,7 +163,7 @@ class _AccountScreenState extends State<AccountScreen> {
               const SizedBox(height: 20),
               SettingItem(
                 title: "Log Out",
-                icon: Ionicons.log_out,
+                icon: Icons.logout_outlined,
                 bgColor: Colors.red.shade100,
                 iconColor: Colors.red,
                 onTap: () {},

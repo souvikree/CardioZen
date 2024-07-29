@@ -27,7 +27,7 @@ class HomeScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(
-              Icons.notifications,
+              Icons.notifications_none_outlined,
               color: Colors.white,
             ),
             onPressed: () {
@@ -126,11 +126,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.home, 'Home', 0),
-          _buildNavItem(Icons.settings, 'Settings', 1),
-          _buildNavItem(Icons.add, 'Predict', 2),
-          _buildNavItem(Icons.help, 'Help', 3),
-          _buildNavItem(Icons.account_box, 'Profile', 4),
+          _buildNavItem(Icons.home_outlined, 'Home', 0),
+          _buildNavItem(Icons.settings_outlined, 'Settings', 1),
+          _buildNavItem(Icons.add_circle_outline_outlined, 'Predict', 2),
+          _buildNavItem(Icons.help_outline_outlined, 'Help', 3),
+          _buildNavItem(Icons.person_2_outlined, 'Profile', 4),
         ],
       ),
     );
