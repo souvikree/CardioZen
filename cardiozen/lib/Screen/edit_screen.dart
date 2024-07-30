@@ -9,8 +9,8 @@ class EditAccountScreen extends StatefulWidget {
 }
 
 class _EditAccountScreenState extends State<EditAccountScreen> {
-  String username = "John Doe";
-  String email = "john.doe@example.com";
+  String username = "Souvik Ghosh";
+  String email = "souvikghosh@example.com";
   String? age;
   String? gender;
   bool isEditing = false;

@@ -1,11 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cardiozen/Screen/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For JSON encoding/decoding
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
-import 'login_screen.dart';
+
 import 'home_screen.dart'; // Import HomeScreen
 
 class RegistrationScreen extends StatefulWidget {
@@ -124,7 +125,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              MaterialPageRoute(builder: (context) => const SignIn()),
             );
           },
           child: const Text(
